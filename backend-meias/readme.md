@@ -4,7 +4,7 @@
 # 🧦 Backend - Sistema de Estoque “meia meia meia”
 
 Este é o backend RESTful em **Node.js + Express + PostgreSQL** do sistema de controle de estoque da fábrica **“meia meia meia”**.  
-Ele fornece autenticação simples de divulgadores, cadastro e gerenciamento de produtos (modelos de meias), além do registro de movimentações de entrada e saída com atualização automática de saldo.
+Ele fornece autenticação simples de divulgadores, cadastro e gerenciamento de materiais (modelos de meias), além do registro de movimentações de entrada e saída com atualização automática de saldo.
 
 ---
 
@@ -44,11 +44,11 @@ O servidor iniciará por padrão em **[http://localhost:3000](http://localhost:3
 | ---------- | ---------------------------- | ---------------------------------------------------------- |
 | **POST**   | `/usuarios`                  | Cadastra novo divulgador                                   |
 | **POST**   | `/auth/login`                | Login simples (retorna `{ id, nome, email }`)              |
-| **GET**    | `/produtos?q=`               | Lista produtos (ordem alfabética; busca opcional)          |
-| **GET**    | `/produtos/:id`              | Obtém um produto específico                                |
-| **POST**   | `/produtos`                  | Cria um novo produto                                       |
-| **PUT**    | `/produtos/:id`              | Atualiza um produto existente                              |
-| **DELETE** | `/produtos/:id`              | Exclui um produto                                          |
+| **GET**    | `/materiais?q=`               | Lista materiais (ordem alfabética; busca opcional)          |
+| **GET**    | `/materiais/:id`              | Obtém um produto específico                                |
+| **POST**   | `/materiais`                  | Cria um novo produto                                       |
+| **PUT**    | `/materiais/:id`              | Atualiza um produto existente                              |
+| **DELETE** | `/materiais/:id`              | Exclui um produto                                          |
 | **POST**   | `/movimentacoes`             | Registra entrada/saída, atualiza o saldo e grava histórico |
 | **GET**    | `/movimentacoes?produto_id=` | Lista o histórico completo ou filtrado por produto         |
 | **GET**    | `/health`                    | Verifica se o backend está ativo                           |
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   senha  TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS produtos (
+CREATE TABLE IF NOT EXISTS materiais (
   id              SERIAL PRIMARY KEY,
   nome            TEXT NOT NULL,
   quantidade      INTEGER NOT NULL DEFAULT 0,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS produtos (
 
 CREATE TABLE IF NOT EXISTS movimentacoes (
   id                 SERIAL PRIMARY KEY,
-  produto_id         INTEGER NOT NULL REFERENCES produtos(id),
+  produto_id         INTEGER NOT NULL REFERENCES materiais(id),
   usuario_id         INTEGER NOT NULL REFERENCES usuarios(id),
   tipo               TEXT NOT NULL,             -- 'entrada' | 'saida'
   quantidade         INTEGER NOT NULL,
@@ -97,47 +97,47 @@ INSERT INTO usuarios (nome, email, senha) VALUES
   ('Carla Dias', 'carla@example.com', '123')
 ON CONFLICT (email) DO NOTHING;
 
--- Produtos (modelos oficiais da "meia meia meia")
-INSERT INTO produtos (nome, quantidade, estoque_minimo) VALUES
+-- materiais (modelos oficiais da "meia meia meia")
+INSERT INTO materiais (nome, quantidade, estoque_minimo) VALUES
   ('meia meia meia arrastão', 40, 10),
-  ('499,5 (meia meia meia 3/4)', 60, 15),
-  ('000 (meia meia meia de cano invisível)', 25, 12)
+  ('Grip de borracha', 60, 15),
+  ('Cinturão', 25, 12)
 ON CONFLICT DO NOTHING;
 
 -- Movimentações (histórico inicial)
 -- Entradas iniciais (Ana)
 INSERT INTO movimentacoes (produto_id, usuario_id, tipo, quantidade, data_movimentacao, observacao) VALUES
-  ((SELECT id FROM produtos WHERE nome='meia meia meia arrastão'),
+  ((SELECT id FROM materiais WHERE nome='Strap'),
    (SELECT id FROM usuarios WHERE email='ana@example.com'),
    'entrada', 30, NOW() - INTERVAL '2 days', 'Compra inicial'),
-  ((SELECT id FROM produtos WHERE nome='499,5 (meia meia meia 3/4)'),
+  ((SELECT id FROM materiais WHERE nome='Grip de borracha'),
    (SELECT id FROM usuarios WHERE email='ana@example.com'),
    'entrada', 50, NOW() - INTERVAL '2 days', 'Compra inicial'),
-  ((SELECT id FROM produtos WHERE nome='000 (meia meia meia de cano invisível)'),
+  ((SELECT id FROM materiais WHERE nome='Cinturão'),
    (SELECT id FROM usuarios WHERE email='ana@example.com'),
    'entrada', 20, NOW() - INTERVAL '2 days', 'Compra inicial');
 
 -- Saídas (Bruno)
 INSERT INTO movimentacoes (produto_id, usuario_id, tipo, quantidade, data_movimentacao, observacao) VALUES
-  ((SELECT id FROM produtos WHERE nome='meia meia meia arrastão'),
+  ((SELECT id FROM materiais WHERE nome='Strap'),
    (SELECT id FROM usuarios WHERE email='bruno@example.com'),
    'saida', 6, NOW() - INTERVAL '1 day', 'Retirada para evento'),
-  ((SELECT id FROM produtos WHERE nome='499,5 (meia meia meia 3/4)'),
+  ((SELECT id FROM materiais WHERE nome='Grip de borracha'),
    (SELECT id FROM usuarios WHERE email='bruno@example.com'),
    'saida', 15, NOW() - INTERVAL '1 day', 'Retirada para feira'),
-  ((SELECT id FROM produtos WHERE nome='000 (meia meia meia de cano invisível)'),
+  ((SELECT id FROM materiais WHERE nome='Cinturão'),
    (SELECT id FROM usuarios WHERE email='bruno@example.com'),
    'saida', 4, NOW() - INTERVAL '1 day', 'Retirada para divulgação');
 
 -- Reposição (Carla)
 INSERT INTO movimentacoes (produto_id, usuario_id, tipo, quantidade, observacao) VALUES
-  ((SELECT id FROM produtos WHERE nome='meia meia meia arrastão'),
+  ((SELECT id FROM materiais WHERE nome='Strap'),
    (SELECT id FROM usuarios WHERE email='carla@example.com'),
    'entrada', 10, 'Devolução de kits'),
-  ((SELECT id FROM produtos WHERE nome='499,5 (meia meia meia 3/4)'),
+  ((SELECT id FROM materiais WHERE nome='Grip de borracha'),
    (SELECT id FROM usuarios WHERE email='carla@example.com'),
    'entrada', 20, 'Devolução de kits'),
-  ((SELECT id FROM produtos WHERE nome='000 (meia meia meia de cano invisível)'),
+  ((SELECT id FROM materiais WHERE nome='Cinturão'),
    (SELECT id FROM usuarios WHERE email='carla@example.com'),
    'entrada', 8, 'Devolução de kits');
 ```
@@ -166,7 +166,7 @@ INSERT INTO movimentacoes (produto_id, usuario_id, tipo, quantidade, observacao)
 
 ## 💡 Observações
 
-* A busca `/produtos?q=` agora **não usa `unaccent()`**, para evitar dependência de extensões PostgreSQL.
+* A busca `/materiais?q=` agora **não usa `unaccent()`**, para evitar dependência de extensões PostgreSQL.
 * O alerta de estoque é disparado **somente quando `quantidade < estoque_minimo`**.
 * O backend **sempre confirma** a movimentação, exibindo o alerta de estoque logo após.
 * O projeto segue o padrão mínimo exigido pela **prova SAEP**, totalmente compatível com o frontend React criado para ela.

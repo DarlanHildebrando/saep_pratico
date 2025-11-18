@@ -20,7 +20,7 @@ export default function App() {
   // -------------------------------
   // estado global simples
   // -------------------------------
-  const [view, setView] = useState("login"); // 'login' | 'home' | 'produtos' | 'estoque'
+  const [view, setView] = useState("login"); // 'login' | 'home' | 'materiais' | 'estoque'
   const [user, setUser] = useState(null); // {id, nome, email}
 
   // -------------------------------
@@ -58,10 +58,10 @@ export default function App() {
   };
 
   // -------------------------------
-  // produtos (6) + uso em estoque (7)
+  // materiais (6) + uso em estoque (7)
   // -------------------------------
-  const [produtos, setProdutos] = useState([]);
-  const [loadingProdutos, setLoadingProdutos] = useState(false);
+  const [materiais, setmateriais] = useState([]);
+  const [loadingmateriais, setLoadingmateriais] = useState(false);
   const [q, setQ] = useState(""); // busca
 
   // form produto
@@ -69,28 +69,28 @@ export default function App() {
   const [produtoForm, setProdutoForm] = useState(emptyProduto);
   const [editandoId, setEditandoId] = useState(null);
 
-  const carregarProdutos = async (term = q) => {
-    setLoadingProdutos(true);
+  const carregarmateriais = async (term = q) => {
+    setLoadingmateriais(true);
     try {
-      const url = notEmpty(term) ? `/produtos?q=${encodeURIComponent(term)}` : "/produtos";
+      const url = notEmpty(term) ? `/materiais?q=${encodeURIComponent(term)}` : "/materiais";
       const { data } = await API.get(url);
-      setProdutos(Array.isArray(data) ? data : []);
+      setmateriais(Array.isArray(data) ? data : []);
     } catch (e) {
-      alert("Erro ao carregar produtos");
+      alert("Erro ao carregar materiais");
     } finally {
-      setLoadingProdutos(false);
+      setLoadingmateriais(false);
     }
   };
 
   useEffect(() => {
-    if (view === "produtos" || view === "estoque") carregarProdutos();
+    if (view === "materiais" || view === "estoque") carregarmateriais();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
-  const produtosOrdenados = useMemo(() => {
+  const materiaisOrdenados = useMemo(() => {
     // 7.1.1 — ordem alfabética no FRONT (não confiar na ordenação do backend)
-    return [...produtos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
-  }, [produtos]);
+    return [...materiais].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR", { sensitivity: "base" }));
+  }, [materiais]);
 
   const limparProdutoForm = () => {
     setProdutoForm(emptyProduto);
@@ -110,12 +110,12 @@ export default function App() {
     const msg = validarProdutoForm();
     if (msg) return alert(msg);
     try {
-      await API.post("/produtos", {
+      await API.post("/materiais", {
         nome: produtoForm.nome.trim(),
         quantidade: toInt(produtoForm.quantidade),
         estoque_minimo: toInt(produtoForm.estoque_minimo),
       });
-      await carregarProdutos();
+      await carregarmateriais();
       limparProdutoForm();
     } catch (e) {
       alert(e?.response?.data?.error || "Erro ao criar produto");
@@ -137,12 +137,12 @@ export default function App() {
     const msg = validarProdutoForm();
     if (msg) return alert(msg);
     try {
-      await API.put(`/produtos/${editandoId}`, {
+      await API.put(`/materiais/${editandoId}`, {
         nome: produtoForm.nome.trim(),
         quantidade: toInt(produtoForm.quantidade),
         estoque_minimo: toInt(produtoForm.estoque_minimo),
       });
-      await carregarProdutos();
+      await carregarmateriais();
       limparProdutoForm();
     } catch (e) {
       alert(e?.response?.data?.error || "Erro ao salvar produto");
@@ -152,8 +152,8 @@ export default function App() {
   const excluirProduto = async (id) => {
     if (!window.confirm("Excluir este produto?")) return;
     try {
-      await API.delete(`/produtos/${id}`);
-      await carregarProdutos();
+      await API.delete(`/materiais/${id}`);
+      await carregarmateriais();
       // 6.1.5 — excluir
     } catch (e) {
       alert(e?.response?.data?.error || "Erro ao excluir produto");
@@ -162,7 +162,7 @@ export default function App() {
 
   const buscar = async (e) => {
     e?.preventDefault();
-    await carregarProdutos(q);
+    await carregarmateriais(q);
     // 6.1.2 — busca atualiza a listagem
   };
 
@@ -198,7 +198,7 @@ export default function App() {
         alert("⚠️ Estoque abaixo do mínimo para este produto!");
       }
       // atualizar listagem para refletir novo saldo
-      await carregarProdutos();
+      await carregarmateriais();
       // limpar form
       setMovQuantidade("");
       setMovObs("");
@@ -255,15 +255,15 @@ export default function App() {
       <h2>Olá, {user?.nome}</h2>
 
       <div className="row-buttons">
-        <button className="btn" onClick={() => setView("produtos")}>Cadastro de Produto</button>
+        <button className="btn" onClick={() => setView("materiais")}>Cadastro de Produto</button>
         <button className="btn" onClick={() => setView("estoque")}>Gestão de Estoque</button>
         <button className="btn" onClick={logout}>Sair</button>
       </div>
     </section>
   )}
 
-  {/* PRODUTOS */}
-  {view === "produtos" && (
+  {/* materiais */}
+  {view === "materiais" && (
     <section className="form-section">
       <h2>Cadastro de Produto</h2>
 
@@ -279,7 +279,7 @@ export default function App() {
         <button
           className="btn"
           type="button"
-          onClick={() => { setQ(""); carregarProdutos(""); }}
+          onClick={() => { setQ(""); carregarmateriais(""); }}
         >
           Limpar
         </button>
@@ -339,9 +339,9 @@ export default function App() {
 
       {/* Tabela */}
       <div className="table-wrapper">
-        {loadingProdutos && <p>Carregando...</p>}
+        {loadingmateriais && <p>Carregando...</p>}
 
-        {!loadingProdutos && (
+        {!loadingmateriais && (
           <table className="prod-table">
             <thead>
               <tr>
@@ -354,7 +354,7 @@ export default function App() {
             </thead>
 
             <tbody>
-              {produtosOrdenados.map((p) => (
+              {materiaisOrdenados.map((p) => (
                 <tr key={p.id}>
                   <td>{p.nome}</td>
                   <td className="center">{p.quantidade}</td>
@@ -369,7 +369,7 @@ export default function App() {
                 </tr>
               ))}
 
-              {produtosOrdenados.length === 0 && (
+              {materiaisOrdenados.length === 0 && (
                 <tr><td colSpan={5}>Nenhum produto.</td></tr>
               )}
             </tbody>
@@ -385,9 +385,9 @@ export default function App() {
       <h2>Gestão de Estoque</h2>
 
       <div className="list-section">
-        <h3>Produtos (ordem alfabética)</h3>
+        <h3>materiais (ordem alfabética)</h3>
         <ul className="prod-list">
-          {produtosOrdenados.map((p) => (
+          {materiaisOrdenados.map((p) => (
             <li key={p.id} className="prod-item">
               <span className="name">{p.nome}</span>
               <span>Qtd: <b>{p.quantidade}</b></span>
@@ -408,7 +408,7 @@ export default function App() {
             onChange={(e) => setMovProdutoId(e.target.value)}
           >
             <option value="">Selecione...</option>
-            {produtosOrdenados.map((p) => (
+            {materiaisOrdenados.map((p) => (
               <option key={p.id} value={p.id}>{p.nome}</option>
             ))}
           </select>
