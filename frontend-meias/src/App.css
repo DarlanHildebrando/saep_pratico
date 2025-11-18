@@ -1,0 +1,296 @@
+/* ===========================
+   TOKENS (cores, raios, sombra)
+   =========================== */
+:root {
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-text: #e6e6e6;
+
+  --color-border: #3a3a3a;
+  --color-primary: #d84b09; /* azul suave para destacar */
+
+  --radius-sm: 5px;
+  --radius-md: 12px;
+
+  --shadow-sm: 0 0 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 0 16px rgba(0, 0, 0, 0.5);
+
+  --spacing-1: 6px;
+  --spacing-2: 10px;
+  --spacing-3: 16px;
+  --spacing-4: 20px;
+}
+
+/* ===========================
+   RESETS BÁSICOS
+   =========================== */
+* {
+  box-sizing: border-box;
+}
+
+body,
+#root {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===========================
+   LAYOUT PRINCIPAL
+   =========================== */
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+
+  width: auto; /* IMPORTANTE */
+  max-width: 600px; /* ou o valor adequado ao seu layout */
+}
+
+
+/* ===========================
+   FORM SECTION (cartão)
+   =========================== */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  width: 100%;
+  max-width: 500px;
+
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===========================
+   CAMPOS DE FORMULÁRIO
+   =========================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+input,
+select {
+  width: 100%;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: white;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ===========================
+   BOTÕES
+   =========================== */
+.btn,
+button {
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover,
+button:hover {
+  background: #222;
+}
+
+.btn:active,
+button:active {
+  transform: scale(0.97);
+}
+
+/* Botões menores */
+.btn-sm {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: 0.85rem;
+}
+
+/* Botão principal */
+.primary {
+  background: var(--color-primary);
+}
+
+/* Botão de perigo */
+.danger {
+  background: #a11;
+}
+
+.danger:hover {
+  background: #800;
+}
+
+/* ===========================
+   FILAS DE BOTÕES / TEMPLATE DE AÇÕES
+   =========================== */
+.row-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+/* ===========================
+   BARRA DE BUSCA
+   =========================== */
+.search-bar {
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-2);
+}
+
+/* ===========================
+   GRID DO FORMULÁRIO
+   =========================== */
+.form-grid {
+  display: grid;
+  gap: var(--spacing-3);
+  width: 100%;
+}
+
+/* ===========================
+   TABELAS
+   =========================== */
+.table-wrapper {
+  width: 100%;
+  margin-top: var(--spacing-3);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: var(--spacing-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-1);
+  justify-content: center;
+}
+
+tbody tr:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ===========================
+   LISTAS DE PRODUTOS (ESTOQUE)
+   =========================== */
+.prod-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.prod-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  background: white;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.prod-item .name {
+  flex: 1;
+}
+
+/* ===========================
+   RESPONSIVIDADE
+   =========================== */
+@media (max-width: 480px) {
+  .form-section {
+    padding: var(--spacing-3);
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  button,
+  .btn {
+    width: 100%;
+  }
+
+  .row-buttons {
+    flex-direction: column;
+  }
+}
+
+input,
+select {
+  background: #2a2a2a;
+  color: var(--color-text);
+}
+
+input::placeholder,
+select::placeholder {
+  color: #9f9f9f;
+}
+
+table {
+  background: #1a1a1a;
+}
+
+tbody tr:hover {
+  background: #2a2a2a;
+}
+
+.prod-item {
+  background: #1a1a1a;
+}
+
+.title-main{
+  text-align: center;
+  width: 150%;
+}
+
+.meat{
+  width: 10%;
+}
+
+.login-title{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
